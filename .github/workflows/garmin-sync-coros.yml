@@ -17,6 +17,9 @@ env:
   COROS_EMAIL: ${{ secrets.COROS_EMAIL }}
   COROS_PASSWORD: ${{ secrets.COROS_PASSWORD }}
 
+  COROS_P1: ${{ secrets.COROS_P1 }}
+  COROS_P2: ${{ secrets.COROS_P2 }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
