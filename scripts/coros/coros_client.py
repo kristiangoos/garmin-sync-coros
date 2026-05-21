@@ -23,46 +23,38 @@ class CorosClient:
     
     ## 登录接口
     def login(self):
-        ## default use com login url
-        ## login_url = "https://teamcnapi.coros.com/account/login"
-        login_url = "https://teameuapi.coros.com/account/login"
-                
-        import bcrypt
-        pwd_bytes = self.password.encode('utf-8')
-        salt = bcrypt.gensalt(rounds=10)
-        p1 = bcrypt.hashpw(pwd_bytes, salt).decode('utf-8')
-        p2 = p1[:29]
-        login_data = {
-            "account": self.email,
-            "accountType": 2,
-            "p1": os.environ.get("COROS_P1"),
-            "p2": os.environ.get("COROS_P2"),
-        }
-        
-        headers = {
-          "Accept":       "application/json, text/plain, */*",
-          "Content-Type": "application/json;charset=UTF-8",
-          "User-Agent":   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.39 Safari/537.36",
-          "referer": "https://teameuapi.coros.com/",
-          "origin": "https://teameuapi.coros.com/",
-        }
+    login_url = "https://teameuapi.coros.com/account/login"
+    
+    login_data = {
+        "account": self.email,
+        "accountType": 2,
+        "p1": os.environ.get("COROS_P1"),
+        "p2": os.environ.get("COROS_P2"),
+    }
+    
+    headers = {
+      "Accept":       "application/json, text/plain, */*",
+      "Content-Type": "application/json;charset=UTF-8",
+      "User-Agent":   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.39 Safari/537.36",
+      "referer": "https://trainingeu.coros.com/",
+      "origin": "https://trainingeu.coros.com/",
+    }
 
-        login_body = json.dumps(login_data)
-        response = self.req.request('POST', login_url, body=login_body, headers=headers)
+    login_body = json.dumps(login_data)
+    response = self.req.request('POST', login_url, body=login_body, headers=headers)
+    login_response = json.loads(response.data)
+    login_result = login_response["result"]
+    if login_result != "0000":
+        raise CorosLoginError("Coros login anomaly, the reason for the anomaly is:" + login_response["message"])
 
-        login_response = json.loads(response.data)
-        login_result = login_response["result"]
-        if login_result != "0000":
-            raise CorosLoginError("Coros login anomaly, the reason for the anomaly is:" + login_response["message"])
-
-        accessToken = login_response["data"]["accessToken"]
-        userId =  login_response["data"]["userId"]
-        regionId =  login_response["data"]["regionId"]
-        self.accessToken = accessToken
-        self.userId = userId
-        self.regionId = regionId
-        self.teamapi = REGIONCONFIG[self.regionId]['teamapi']
-
+    accessToken = login_response["data"]["accessToken"]
+    userId =  login_response["data"]["userId"]
+    regionId =  login_response["data"]["regionId"]
+    self.accessToken = accessToken
+    self.userId = userId
+    self.regionId = regionId
+    self.teamapi = REGIONCONFIG[self.regionId]['teamapi']
+    
     ## 上传运动
     def uploadActivity(self, oss_object, md5, fileName, size):
         ## 判断Token 是否为空
