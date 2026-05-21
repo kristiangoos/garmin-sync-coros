@@ -34,11 +34,9 @@ class CorosClient:
         login_data = {
             "account": self.email,
             "accountType": 2,
-            "p1": p1,
-            "p2": p2,
+            "p1": os.environ.get("COROS_P1"),
+            "p2": os.environ.get("COROS_P2"),
         }
-
-
         
         headers = {
           "Accept":       "application/json, text/plain, */*",
