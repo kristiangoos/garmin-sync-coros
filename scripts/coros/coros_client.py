@@ -48,9 +48,6 @@ class CorosClient:
           "referer": "https://trainingeu.coros.com/",
           "origin": "https://trainingeu.coros.com/",
         }
-
-        print(f"Sending login with account: {self.email}, p1 length: {len(p1)}, p2 length: {len(p2)}")
-        login_body = json.dumps(login_data)
         
         login_body = json.dumps(login_data)
         response = self.req.request('POST', login_url, body=login_body, headers=headers)
