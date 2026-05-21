@@ -1,7 +1,7 @@
 import urllib3
 import json
 import hashlib
-
+import bcrypt
 import certifi
 
 
@@ -25,12 +25,21 @@ class CorosClient:
         ## default use com login url
         ## login_url = "https://teamcnapi.coros.com/account/login"
         login_url = "https://teameuapi.coros.com/account/login"
-        
+                
+        import bcrypt
+        pwd_bytes = self.password.encode('utf-8')
+        salt = bcrypt.gensalt(rounds=10)
+        p1 = bcrypt.hashpw(pwd_bytes, salt).decode('utf-8')
+        p2 = p1[:29]
         login_data = {
             "account": self.email,
-            "pwd": hashlib.md5(self.password.encode()).hexdigest(), ##MD5加密密码
-            "accountType":2,
+            "accountType": 2,
+            "p1": p1,
+            "p2": p2,
         }
+
+
+        
         headers = {
           "Accept":       "application/json, text/plain, */*",
           "Content-Type": "application/json;charset=UTF-8",
