@@ -29,13 +29,14 @@ class CorosClient:
         salt = bcrypt.gensalt(rounds=10)
         p1 = bcrypt.hashpw(pwd_bytes, salt).decode('utf-8')
         p2 = p1[:29]
-        
+
         login_data = {
             "account": self.email,
             "accountType": 2,
-            "p1": p1,
-            "p2": p2,
+            "p1": os.environ.get("COROS_P1"),
+            "p2": os.environ.get("COROS_P2"),
         }
+
         
         headers = {
           "Accept":       "application/json, text/plain, */*",
