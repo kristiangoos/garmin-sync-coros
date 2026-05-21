@@ -35,8 +35,10 @@ class CorosClient:
           "Accept":       "application/json, text/plain, */*",
           "Content-Type": "application/json;charset=UTF-8",
           "User-Agent":   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.39 Safari/537.36",
-          "referer": "https://teamcnapi.coros.com/",
-          "origin": "https://teamcnapi.coros.com/",
+         ## "referer": "https://teamcnapi.coros.com/",
+         ## "origin": "https://teamcnapi.coros.com/",
+            "referer": "https://training.coros.com/",
+            "origin": "https://training.coros.com/",
         }
 
         login_body = json.dumps(login_data)
