@@ -1,10 +1,8 @@
 import os
 import urllib3
 import json
-import hashlib
-import bcrypt
+import base64
 import certifi
-
 
 from coros.region_config import REGIONCONFIG
 from coros.sts_config import STS_CONFIG
@@ -12,7 +10,6 @@ from coros.sts_config import STS_CONFIG
 class CorosClient:
     
     def __init__(self, email, password) -> None:
-        
         self.email = email
         self.password = password
         self.req = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
@@ -21,16 +18,9 @@ class CorosClient:
         self.regionId = None
         self.teamapi = None
     
-    ## 登录接口
     def login(self):
         login_url = "https://teameuapi.coros.com/account/login"
         
-        pwd_bytes = self.password.encode('utf-8')
-        salt = bcrypt.gensalt(rounds=10)
-        ## p1 = bcrypt.hashpw(pwd_bytes, salt).decode('utf-8')
-        ## p2 = p1[:29]
-
-        import base64
         p1 = base64.b64decode(os.environ.get("COROS_P1")).decode('utf-8')
         p2 = base64.b64decode(os.environ.get("COROS_P2")).decode('utf-8')
         
@@ -56,15 +46,11 @@ class CorosClient:
         if login_result != "0000":
             raise CorosLoginError("Coros login anomaly, the reason for the anomaly is:" + login_response["message"])
     
-        accessToken = login_response["data"]["accessToken"]
-        userId =  login_response["data"]["userId"]
-        regionId =  login_response["data"]["regionId"]
-        self.accessToken = accessToken
-        self.userId = userId
-        self.regionId = regionId
+        self.accessToken = login_response["data"]["accessToken"]
+        self.userId = login_response["data"]["userId"]
+        self.regionId = login_response["data"]["regionId"]
         self.teamapi = REGIONCONFIG[self.regionId]['teamapi']
     
-    ## 上传运动
     def uploadActivity(self, oss_object, md5, fileName, size):
         if self.accessToken == None:
             self.login()
@@ -82,7 +68,6 @@ class CorosClient:
           data = {"source":1,"timezone":32,"bucket":f"{bucket}","md5":f"{md5}","size":size,"object":f"{oss_object}","serviceName":f"{serviceName}","oriFileName":f"{fileName}"}
           json_data = json.dumps(data)
           json_str = str(json_data)
-          print(json_str)
           response = self.req.request(
               method = 'POST',
               url=upload_url,
@@ -90,8 +75,7 @@ class CorosClient:
               headers=headers
           )
           upload_response = json.loads(response.data)
-          print(upload_response)
-          if upload_response["data"].get("status") == 2 and  upload_response["result"] == "0000":
+          if upload_response["data"].get("status") == 2 and upload_response["result"] == "0000":
              return True
           else:
              return False
@@ -111,8 +95,7 @@ class CorosClient:
               url=activitys_url,
               headers=headers
           )
-          response = json.loads(response.data)
-          return response
+          return json.loads(response.data)
         except Exception as err:
             exit() 
 
@@ -131,7 +114,7 @@ class CorosClient:
             else:
                 return all_activities
             page += 1
-            
+
     def downloadActivitie(self, id, sport_type):
        self.checkToken()
        get_activity_download_url = f"{self.teamapi}/activity/detail/download?labelId={id}&sportType={sport_type}&fileType=4"
@@ -157,15 +140,11 @@ class CorosClient:
             self.login()
 
 class CorosLoginError(Exception):
-
     def __init__(self, status):
-        """Initialize."""
         super(CorosLoginError, self).__init__(status)
         self.status = status
 
 class CorosActivityUploadError(Exception):
-
     def __init__(self, status):
-        """Initialize."""
         super(CorosActivityUploadError, self).__init__(status)
         self.status = status
