@@ -24,8 +24,8 @@ class CorosClient:
     def login(self):
         ## default use com login url
         ## login_url = "https://teamcnapi.coros.com/account/login"
-        login_url = "https://teamapi.coros.com/account/login"
-
+        login_url = "https://teameuapi.coros.com/account/login"
+        
         login_data = {
             "account": self.email,
             "pwd": hashlib.md5(self.password.encode()).hexdigest(), ##MD5加密密码
@@ -35,10 +35,8 @@ class CorosClient:
           "Accept":       "application/json, text/plain, */*",
           "Content-Type": "application/json;charset=UTF-8",
           "User-Agent":   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.39 Safari/537.36",
-         ## "referer": "https://teamcnapi.coros.com/",
-         ## "origin": "https://teamcnapi.coros.com/",
-            "referer": "https://training.coros.com/",
-            "origin": "https://training.coros.com/",
+          "referer": "https://teameuapi.coros.com/",
+          "origin": "https://teameuapi.coros.com/",
         }
 
         login_body = json.dumps(login_data)
