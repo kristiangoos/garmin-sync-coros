@@ -18,7 +18,9 @@ env:
   ### 按需选择，如果选择 garmin_to_coros 佳明同步高驰
   ### 如果选择 coros_to_garmin 高驰同步佳明
   RUN_TYPE: coros_to_garmin # garmin_to_coros 佳明同步高驰、 coros_to_garmin
-
+  COROS_P1: ${{ secrets.COROS_P1 }}
+  COROS_P2: ${{ secrets.COROS_P2 }}
+  
 jobs:
   build:
     runs-on: ubuntu-latest
