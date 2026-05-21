@@ -25,11 +25,16 @@ class CorosClient:
     def login(self):
         login_url = "https://teameuapi.coros.com/account/login"
         
+        pwd_bytes = self.password.encode('utf-8')
+        salt = bcrypt.gensalt(rounds=10)
+        p1 = bcrypt.hashpw(pwd_bytes, salt).decode('utf-8')
+        p2 = p1[:29]
+        
         login_data = {
             "account": self.email,
             "accountType": 2,
-            "p1": os.environ.get("COROS_P1"),
-            "p2": os.environ.get("COROS_P2"),
+            "p1": p1,
+            "p2": p2,
         }
         
         headers = {
@@ -57,7 +62,6 @@ class CorosClient:
     
     ## 上传运动
     def uploadActivity(self, oss_object, md5, fileName, size):
-        ## 判断Token 是否为空
         if self.accessToken == None:
             self.login()
 
@@ -107,7 +111,7 @@ class CorosClient:
           return response
         except Exception as err:
             exit() 
-     ## 获取所有运动
+
     def getAllActivities(self): 
       all_activities = []
       size = 200
@@ -120,11 +124,9 @@ class CorosClient:
         else:
           return all_activities
         page += 1
-    
 
     def downloadActivitie(self, id, sport_type):
        self.checkToken()
-       ## 文件下载链接
        get_activity_download_url = f"{self.teamapi}/activity/detail/download?labelId={id}&sportType={sport_type}&fileType=4"
        headers = {
           "Accept":       "application/json, text/plain, */*",
@@ -143,11 +145,10 @@ class CorosClient:
           headers=headers
       )
 
-    ## 检查token是否有效
     def checkToken(self):
-        ## 判断Token 是否为空
         if self.accessToken == None:
             self.login()
+
 class CorosLoginError(Exception):
 
     def __init__(self, status):
