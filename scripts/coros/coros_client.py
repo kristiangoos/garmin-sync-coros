@@ -122,6 +122,7 @@ class CorosClient:
       page = 1
       while(True):
         activities = self.getActivities(size, page)
+        print(f"Activities response: {activities}")
         totalPage = activities['data']['totalPage']
         if totalPage >= page:
           all_activities.extend(activities['data']['dataList'])
