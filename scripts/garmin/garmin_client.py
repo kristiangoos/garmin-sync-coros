@@ -24,22 +24,55 @@ class GarminClient:
             "nk": "NT"
         }
   
+  # ## 登录装饰器
+  # def login(func):    
+  #   def ware(self, *args, **kwargs):    
+  #     try:
+  #        garth.client.username
+  #     except Exception:
+  #       logger.warning("Garmin is not logging in or the token has expired.")
+  #       if self.auth_domain and str(self.auth_domain).upper() == "CN":
+  #         self.garthClient.configure(domain="garmin.cn")
+  #       self.garthClient.login(self.email, self.password)
+        
+  #       # del self.garthClient.sess.headers['User-Agent']
+  #       del self.garthClient.client.sess.headers['User-Agent']
+
+  #     return func(self, *args, **kwargs)
+  #   return ware
+
   ## 登录装饰器
   def login(func):    
     def ware(self, *args, **kwargs):    
+      # Дефинираме папка, в която ще се пази и чете сесията
+      garth_dir = os.path.expanduser("~/.garth")
+      
       try:
+         # 1. Опит да заредим вече записана сесия от диска
+         if os.path.exists(garth_dir):
+             garth.client.loads(garth_dir)
+         
+         # Проверка дали токенът е валиден
          garth.client.username
+         logger.info("Успешно заредена съществуваща сесия за Garmin.")
       except Exception:
-        logger.warning("Garmin is not logging in or the token has expired.")
+        logger.warning("Garmin is not logging in or the token has expired. Logging in with credentials...")
         if self.auth_domain and str(self.auth_domain).upper() == "CN":
           self.garthClient.configure(domain="garmin.cn")
+        
+        # 2. Прави нов логин с потребителско име и парола САМО ако горното се провали
         self.garthClient.login(self.email, self.password)
+        
+        # 3. Запазва новата валидна сесия във файл веднага
+        os.makedirs(garth_dir, exist_ok=True)
+        garth.client.dumps(garth_dir)
         
         # del self.garthClient.sess.headers['User-Agent']
         del self.garthClient.client.sess.headers['User-Agent']
 
       return func(self, *args, **kwargs)
     return ware
+
   
   @login 
   def download(self, path, **kwargs):
