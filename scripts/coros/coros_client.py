@@ -117,19 +117,21 @@ class CorosClient:
             exit() 
 
     def getAllActivities(self): 
-      all_activities = []
-      size = 200
-      page = 1
-      while(True):
-        activities = self.getActivities(size, page)
-        print(f"Activities response: {activities}")
-        totalPage = activities['data']['totalPage']
-        if totalPage >= page:
-          all_activities.extend(activities['data']['dataList'])
-        else:
-          return all_activities
-        page += 1
-
+        all_activities = []
+        size = 200
+        page = 1
+        while(True):
+            activities = self.getActivities(size, page)
+            data = activities.get('data', {})
+            totalPage = data.get('totalPage', 0)
+            if totalPage == 0:
+                return all_activities
+            if totalPage >= page:
+                all_activities.extend(data.get('dataList', []))
+            else:
+                return all_activities
+            page += 1
+            
     def downloadActivitie(self, id, sport_type):
        self.checkToken()
        get_activity_download_url = f"{self.teamapi}/activity/detail/download?labelId={id}&sportType={sport_type}&fileType=4"
