@@ -23,7 +23,8 @@ class CorosClient:
     ## 登录接口
     def login(self):
         ## default use com login url
-        login_url = "https://teamcnapi.coros.com/account/login"
+        ## login_url = "https://teamcnapi.coros.com/account/login"
+        login_url = "https://teamapi.coros.com/account/login"
 
         login_data = {
             "account": self.email,
